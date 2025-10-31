@@ -1,5 +1,6 @@
 const express = require("express");
-const dbConnection = require("./src/Database/db");
+const dbConnection = require("./Src/Database/db");
+const authroutes = require('./Src/Routes/authroutes');
 require("dotenv").config();
 
 const app = express();
@@ -10,6 +11,9 @@ dbConnection();
 
 //Middleware
 app.use(express.json());
+
+//Register all routes here 
+app.use('/api/auth', authroutes);
 
 app.listen(PORT, ()=>{
     console.log("Server.js is running...")
