@@ -8,7 +8,7 @@ const register = async (req, res) => {
 
   // Validate the user fields
   if (!username || !email || !password || !role) {
-    res.status(400).json({
+      return res.status(400).json({
       status: 400,
       success: false,
       message: "Please fill all User Inputs",
@@ -17,11 +17,11 @@ const register = async (req, res) => {
 
   try {
     //Check username and password exist or not
-    const preExits = await User.findOne({
+    const preExits = await user.findOne({
       $or: [{ email }, { username }],
     });
     if (preExits) {
-      res.status(409).json({
+        return res.status(409).json({
         success: false,
         status: 409,
         message: "User Already Exists",
@@ -41,13 +41,13 @@ const register = async (req, res) => {
 
     await newUser.save();
 
-    res.status(200).json({
+      return res.status(200).json({
       success: true,
       status: 200,
       message: "registered successfully",
     });
   } catch (error) {
-    res.status(500).json({
+      return res.status(500).json({
       success: false,
       status: 500,
       message: "Internal server Error",
@@ -60,7 +60,7 @@ const login = async (req, res) => {
 
   // Validate the user fields
   if (!username || !email || !password) {
-    res.status(400).json({
+      return res.status(400).json({
       status: 400,
       success: false,
       message: "Please fill username/email with password",
@@ -69,11 +69,11 @@ const login = async (req, res) => {
 
   try {
     //check user is registered or not
-    const userExists = User.findOne({
+    const userExists = await user.findOne({
       $or: [{ username, email }],
     });
     if (!userExists) {
-      res.status(409).json({
+        return res.status(409).json({
         success: false,
         status: 409,
         message: "User Not Exists. Register First",
@@ -82,7 +82,7 @@ const login = async (req, res) => {
 
     const isPasswordMatch = await bcrypt.compare(password, userExists.password);
     if (!isPasswordMatch) {
-      res.status(404).json({
+        return res.status(404).json({
         success: false,
         status: 404,
         message: "Incorrect Password",
@@ -103,21 +103,21 @@ const login = async (req, res) => {
     //set token in HTTP-only cookies or send it to res so in local/session storage
     //but here storing in cookies
 
-    res.cookies("token", token, {
+    res.cookie("token", token, {
       httpOnly: true,
       //secure: process.env.NODE_ENV === "production", // set true in production
       sameSite: "strict",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
-    res.status(200).json({
+    return res.status(200).json({
        status: 200,
       success: true,
       message: "Logged In successfully",
       token
     });
   } catch (error) {
-    res.status(500).json({
+      return res.status(500).json({
       status: 500,
       success: false,
       message: "Internal Server error",
